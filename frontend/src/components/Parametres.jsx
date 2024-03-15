@@ -1,6 +1,8 @@
-import React, {useState} from 'react'
+import {useState} from 'react'
 import { Card } from 'antd'
 import RoomList from './RoomList'
+import CreateRoom from './CreateRoom';
+import ScoreBoard from './ScoreBoard';
 
 const tabListNoTitle = [
   {
@@ -20,17 +22,18 @@ const tabListNoTitle = [
 
 
 const Parametres = () => {
-  const [activeTabKey2, setActiveTabKey2] = useState('jeuxDispo');
+  const [activeTabKey, setActiveTabKey] = useState('jeuxDispo');
   let rooms = []
+  let players =[]
 
   const onTab2Change = (key) => {
-    setActiveTabKey2(key);
+    setActiveTabKey(key);
   }
 
   const contentListNoTitle = {
     jeuxDispo: <RoomList rooms={rooms} />,
-    creerJeux: <p>app content</p>,
-    tableauScore: <p>project content</p>,
+    creerJeux: <CreateRoom />,
+    tableauScore: <ScoreBoard players={players} />, // TODO : pass the list of player to this component.
   };
 
   return (
@@ -38,13 +41,13 @@ const Parametres = () => {
       <Card
         style={{ width: '100%', marginTop: '20px' }}
         tabList={tabListNoTitle}
-        activeTabKey={activeTabKey2}
+        activeTabKey={activeTabKey}
         onTabChange={onTab2Change}
         tabProps={{
           size: 'middle',
         }}
       >
-        {contentListNoTitle[activeTabKey2]}
+        {contentListNoTitle[activeTabKey]}
       </Card>
 
     </>

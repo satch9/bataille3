@@ -1,9 +1,15 @@
 const socketio = require("socket.io");
 
-const initializeSocket = (server)=>{
-    const io = socketio(server, {
+const initializeSocket = (server) => {
+    /* const io = socketio(server, {
         cors: {
             origin: "https://orange-fiesta-x544j5r7p7ph6wr4-5173.app.github.dev", // Modifier en fonction de votre configuration frontend
+            methods: ["GET", "POST"],
+        }
+    }); */
+    const io = socketio(server, {
+        cors: {
+            origin: "http://localhost:5173", // Modifier en fonction de votre configuration frontend
             methods: ["GET", "POST"],
         }
     });
@@ -15,7 +21,7 @@ const initializeSocket = (server)=>{
     const rooms = [];
     let NUMBERS_OF_CARDS;
 
-    io.on("connection", (socket)=>{
+    io.on("connection", (socket) => {
         const userId = socket.id;
         console.log(`User ${userId} has connected.`);
 
