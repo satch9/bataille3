@@ -1,11 +1,24 @@
-import { Button, Form, Input, Select, } from 'antd';
+import { Button, Form, Input, Select, message } from 'antd'
+import { useContext, useCallback, useEffect } from 'react'
+import { SocketContext } from '../context/SocketContext'
 
 const CreateRoom = () => {
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
+    const socket = useContext(SocketContext)
+    const [messageApi, contextHolder] = message.useMessage()
+
+    const info = useCallback((text) => {
+        messageApi.info(text);
+    }, [messageApi])
+
+    useEffect(()=>{
+
+    },[socket])
 
     const onCreateRoom = (values) => {
         console.log("values [createRoom]", values);
-
+        info(`Salle "${values.roomName}" créé par ${values.creator}`)
+        socket.emit("create room", values);
     }
 
     const onFinish = () => {
@@ -24,6 +37,7 @@ const CreateRoom = () => {
             onFinish={onFinish}
             form={form}
         >
+            {contextHolder}
             <Form.Item
                 name="roomName"
                 rules={[{ required: true, message: 'Veuillez saisir le nom de la salle!' }]}

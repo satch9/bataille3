@@ -20,11 +20,51 @@ const initializeSocket = (server) => {
 
     const rooms = [];
     let NUMBERS_OF_CARDS;
+    const INTERVAL_TIME = 1000;
 
     io.on("connection", (socket) => {
         const userId = socket.id;
         console.log(`User ${userId} has connected.`);
 
+        socket.on("create room", (values) => {
+            try {
+
+                console.log("Creating a new room...", values)
+                const creator = new Player(userId, values.creator)
+                console.log("creator", creator)
+
+                const room = new Room(values)
+                room.addPlayer(creator)
+                room.savePlayerToDatabase()
+                    .then((playerId) => {
+                        console.log("Joueur ajouté à la base de donnée avec succès. ID : ", playerId)
+                        socket.join(room.getName())
+                    })
+                    .catch((error) => {
+                        console.error("Erreur lors de l'enregistrement du joueur dans la base de données : ", error)
+                    })
+                room.createRoomToDatabase()
+                    .then(() => {
+                        console.log('La salle a été enregistrée dans la base de données avec succès.')
+                        rooms.push(room);
+                        socket.emit("room created", room)
+                    })
+                    .catch((error) => {
+                        console.error("Erreur lors de l'enregistrement de la salle dans la base de données : ", error)
+                    })
+            } catch (error) {
+                console.log("error", error)
+            }
+        })
+
+        setInterval(async () => {
+            try {
+                // allrooms =await Room.find({})
+                io.emit("rooms available", rooms)
+            } catch (error) {
+                console.log(error)
+            }
+        }, INTERVAL_TIME)
 
 
         // Handle user disconnection

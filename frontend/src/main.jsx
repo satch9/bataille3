@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
-import { SocketContext, socket } from './context/SocketContex.js'
+import { SocketContext, socket } from './context/SocketContext.js'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -1,5 +1,7 @@
-import {useState} from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { Card } from 'antd'
+import { SocketContext } from '../context/SocketContext';
+
 import RoomList from './RoomList'
 import CreateRoom from './CreateRoom';
 import ScoreBoard from './ScoreBoard';
@@ -23,15 +25,30 @@ const tabListNoTitle = [
 
 const Parametres = () => {
   const [activeTabKey, setActiveTabKey] = useState('jeuxDispo');
-  let rooms = []
-  let players =[]
+  const socket = useContext(SocketContext)
+  const [roomList, setRoomList] = useState([])
+  //const [scoreBoard, setScoreBoard] = useState({})
+  
+  // On récupère la  liste des salles de jeux à partir du serveur.
+  useEffect(() => {
+    socket.on("rooms available", (data)=>{
+      console.log("received data : ", data)
+      setRoomList(data)
+    })
+      
+    return (()=>{socket.off("rooms available")}) //clean up when component is unmounted
+  }, [socket])
+
+  let players = []
 
   const onTab2Change = (key) => {
     setActiveTabKey(key);
   }
 
+  
+
   const contentListNoTitle = {
-    jeuxDispo: <RoomList rooms={rooms} />,
+    jeuxDispo: <RoomList rooms={roomList} />,
     creerJeux: <CreateRoom />,
     tableauScore: <ScoreBoard players={players} />, // TODO : pass the list of player to this component.
   };
