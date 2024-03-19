@@ -1,18 +1,18 @@
 const socketio = require("socket.io");
 
 const initializeSocket = (server) => {
-    /* const io = socketio(server, {
+    const io = socketio(server, {
         cors: {
             origin: "https://orange-fiesta-x544j5r7p7ph6wr4-5173.app.github.dev", // Modifier en fonction de votre configuration frontend
             methods: ["GET", "POST"],
         }
-    }); */
-    const io = socketio(server, {
+    });
+    /* const io = socketio(server, {
         cors: {
             origin: "http://localhost:5173", // Modifier en fonction de votre configuration frontend
             methods: ["GET", "POST"],
         }
-    });
+    }); */
 
     const Deck = require("../backend/src/models/Deck");
     const Room = require("../backend/src/models/Room");
@@ -25,6 +25,25 @@ const initializeSocket = (server) => {
     io.on("connection", (socket) => {
         const userId = socket.id;
         console.log(`User ${userId} has connected.`);
+
+         Room.getAll((err, rooms) => {
+            if (err) {
+                console.error(`Erreur lors de la récupération de toutes les salles :`, err);
+                return;
+            }
+            console.log(`Toutes les salles :`, rooms);
+
+            io.emit("rooms available", rooms)
+        });
+
+        setInterval(async () => {
+            try {
+                
+
+            } catch (error) {
+                console.log(error)
+            }
+        }, INTERVAL_TIME)
 
         socket.on("create room", (values) => {
             try {
@@ -57,14 +76,6 @@ const initializeSocket = (server) => {
             }
         })
 
-        setInterval(async () => {
-            try {
-                // allrooms =await Room.find({})
-                io.emit("rooms available", rooms)
-            } catch (error) {
-                console.log(error)
-            }
-        }, INTERVAL_TIME)
 
 
         // Handle user disconnection

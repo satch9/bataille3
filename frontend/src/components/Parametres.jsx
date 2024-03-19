@@ -32,7 +32,7 @@ const Parametres = () => {
   // On récupère la  liste des salles de jeux à partir du serveur.
   useEffect(() => {
     socket.on("rooms available", (data)=>{
-      console.log("received data : ", data)
+      //console.log("received data : ", data)
       setRoomList(data)
     })
       

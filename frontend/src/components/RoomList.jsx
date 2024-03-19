@@ -1,23 +1,49 @@
-import { List, Avatar } from 'antd';
+import { useState } from 'react';
+import { List, Avatar, Button, Spin } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
+import ModalGameAvailable from './ModalGameAvailable';
 
 
 const RoomList = ({ rooms }) => {
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const handleJoin = (room) => {
+    // Add code here to handle joining the room
+    console.log(`Joining room ${room.name}`);
+    setOpen(true);
+    setLoading(true);
+    
+    
+    // Add code here to handle joining the room
+    /* joinRoom(room).then(() => {
+      setLoading(false);
+    }); */
+  }
+
+  const renderItem = (room) => {
+    //console.log("room", room)
+    return (
+      <List.Item>
+        <List.Item.Meta
+          avatar={<Avatar icon={<UserOutlined />} />}
+          title={room.name}
+          description={`Créateur : ${room.creatorName} `}
+        />
+        <Button onClick={() => handleJoin(room)}>
+          Rejoindre &nbsp; {loading && <Spin size="small" />}
+        </Button>
+        <ModalGameAvailable open={open} setOpen={setOpen} />
+      </List.Item>
+    )
+  }
 
   return (
     <List
       itemLayout="horizontal"
       dataSource={rooms}
-      renderItem={room => (
-        <List.Item>
-          <List.Item.Meta
-            avatar={<Avatar icon={<UserOutlined />} />}
-            title={room.name}
-            description={`${room.players.length} joueurs`}
-          />
-        </List.Item>
-      )}
+      renderItem={renderItem}
     />
   );
 };

@@ -4,12 +4,38 @@ const db = new sqlite3.Database("../bataille.db");
 
 class Room {
     constructor(params) {
-        this.name = params.roomName
-        this.numCards = params.numCards
-        this.players = []
-        this.lastCard = null
-        this.creatorName = params.creator
         this.roomId = null
+        this.name = params.roomName
+        this.numCards = parseInt(params.numCards)
+        this.creator = params.creator
+        this.lastCard = null
+        this.players = []
+    }
+
+    static async getAll(callback) {
+        let sql = `SELECT r.room_id AS room_id, r.room_name AS room_name, r.room_number_of_cards AS room_number_of_cards, p.name AS player, p.hand AS hand FROM Rooms r LEFT JOIN Game_Players gp ON r.room_id = gp.id LEFT JOIN Players p ON gp.player_id = p.id LEFT JOIN Game g ON gp.id = g.game_id GROUP BY r.room_id, g.game_id ORDER BY r.room_id ASC;`
+        try {
+            const rows = await new Promise((resolve, reject) => {
+                db.all(sql, [], function (err, rows) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(rows);
+                    }
+                });
+            });
+            console.log("rows", rows)
+            const rooms = rows.map((row) => new Room(
+                {
+                    roomName: row.room_name,
+                    room_number_of_cards: parseInt(row.room_number_of_cards)
+                })
+            );
+            callback(null, rooms);
+        } catch (error) {
+            console.error(`Erreur lors de la récupération de toutes les salles :`, error);
+            callback(error);
+        }
     }
 
     addPlayer(player) {
@@ -97,7 +123,7 @@ class Room {
             console.log("room_id createGame", room_id);
 
             const result = await new Promise((resolve, reject) => {
-                db.run(`INSERT INTO Game (game_room_id, game_start_date) VALUES (?, ?)`, [room_id, game_start_date], function (err) {
+                db.run(`INSERT INTO Game (game_room_id, game_start_date) VALUES (?, ?)`, [room_id, room_createdAt], function (err) {
                     if (err) {
                         reject(err); // Rejeter la promesse en cas d'erreur
                     } else {
